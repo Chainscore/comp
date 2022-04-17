@@ -8,21 +8,26 @@
     "build": "graph build --ipfs https://api.staging.thegraph.com/ipfs/ ",
     "create-local": "graph create graphprotocol/compound-v2 --node http://127.0.0.1:8020",
     "deploy-local": "graph deploy graphprotocol/compound-v2 --debug --ipfs http://localhost:5001 --node http://127.0.0.1:8020/",
-    "deploy": "graph deploy graphprotocol/compound-v2 --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "deploy-staging": "graph deploy --debug --ipfs https://api.staging.thegraph.com/ipfs/ --node https://api.staging.thegraph.com/deploy/ davekaj/compoundv2",
-    "prettier": "./node_modules/.bin/prettier —-write '**/*.ts'"
+    "prettier": "./node_modules/.bin/prettier —-write '**/*.ts'",
+    "prepare:mainnet": "mustache ./config/mainnet.json template.yaml > subgraph.yaml",
+    "prepare:harmony": "mustache ./config/harmony.json template.yaml > subgraph.yaml",
+    "prepare:aurora": "mustache ./config/aurora.json template.yaml > subgraph.yaml",
+    "deploy:mainnet": "graph deploy chainscore/comp --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
+    "test": "graph test"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.18.0",
-    "@graphprotocol/graph-ts": "0.18.0",
+    "@graphprotocol/graph-cli": "^0.29.0",
+    "@graphprotocol/graph-ts": "^0.26.0",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
     "eslint": "^6.2.2",
     "eslint-config-prettier": "^6.1.0",
-    "prettier": "^1.18.2",
-    "typescript": "^3.5.2",
     "husky": "^3.0.5",
-    "lint-staged": "^9.2.5"
+    "lint-staged": "^9.2.5",
+    "matchstick-as": "^0.4.2",
+    "prettier": "^1.18.2",
+    "typescript": "^3.5.2"
   },
   "husky": {
     "hooks": {
@@ -34,5 +39,8 @@
       "prettier --write --config ./.prettierrc",
       "git add"
     ]
+  },
+  "dependencies": {
+    "mustache": "^4.2.0"
   }
 }

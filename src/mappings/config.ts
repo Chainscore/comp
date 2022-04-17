@@ -1,0 +1,7 @@
+import { BigInt, BigDecimal } from '@graphprotocol/graph-ts'
+
+export let ZERO_BD = BigDecimal.fromString('0')
+export let ONE_BD = BigDecimal.fromString('0')
+
+export let ZERO_BI = BigInt.fromString('0')
+export let ONE_BI = BigInt.fromString('0')

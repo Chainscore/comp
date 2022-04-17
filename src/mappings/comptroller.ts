@@ -13,19 +13,27 @@ import {
 
 import { CToken } from '../types/templates'
 import { Market, Comptroller, Account } from '../types/schema'
-import { mantissaFactorBD, updateCommonCTokenStats, createAccount } from './helpers'
+import {
+  mantissaFactorBD,
+  updateCommonCTokenStats,
+  createAccount,
+  getOrCreateComptroller,
+} from './helpers'
 import { createMarket } from './markets'
 
 export function handleMarketListed(event: MarketListed): void {
+  let comptroller = getOrCreateComptroller(event.address.toHex())
+  comptroller.save()
   // Dynamically index all new listed tokens
   CToken.create(event.params.cToken)
   // Create the market for this token, since it's now been listed.
-  let market = createMarket(event.params.cToken.toHexString())
+  let market = createMarket(event.params.cToken.toHex())
+  market.comptroller = comptroller.id
   market.save()
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.cToken.toHex())
   // Null check needed to avoid crashing on a new market added. Ideally when dynamic data
   // sources can source from the contract creation block and not the time the
   // comptroller adds the market, we can avoid this altogether
@@ -38,7 +46,6 @@ export function handleMarketEntered(event: MarketEntered): void {
 
     let cTokenStats = updateCommonCTokenStats(
       market.id,
-      market.symbol,
       accountID,
       event.transaction.hash,
       event.block.timestamp,
@@ -51,7 +58,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 }
 
 export function handleMarketExited(event: MarketExited): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.cToken.toHex())
   // Null check needed to avoid crashing on a new market added. Ideally when dynamic data
   // sources can source from the contract creation block and not the time the
   // comptroller adds the market, we can avoid this altogether
@@ -64,7 +71,6 @@ export function handleMarketExited(event: MarketExited): void {
 
     let cTokenStats = updateCommonCTokenStats(
       market.id,
-      market.symbol,
       accountID,
       event.transaction.hash,
       event.block.timestamp,
@@ -77,13 +83,13 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
-  let comptroller = Comptroller.load('1')
+  let comptroller = getOrCreateComptroller(event.address.toHex())
   comptroller.closeFactor = event.params.newCloseFactorMantissa
   comptroller.save()
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.cToken.toHex())
   // Null check needed to avoid crashing on a new market added. Ideally when dynamic data
   // sources can source from the contract creation block and not the time the
   // comptroller adds the market, we can avoid this altogether
@@ -97,23 +103,19 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 
 // This should be the first event acccording to etherscan but it isn't.... price oracle is. weird
 export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
-  let comptroller = Comptroller.load('1')
+  let comptroller = getOrCreateComptroller(event.address.toHex())
   comptroller.liquidationIncentive = event.params.newLiquidationIncentiveMantissa
   comptroller.save()
 }
 
 export function handleNewMaxAssets(event: NewMaxAssets): void {
-  let comptroller = Comptroller.load('1')
+  let comptroller = getOrCreateComptroller(event.address.toHex())
   comptroller.maxAssets = event.params.newMaxAssets
   comptroller.save()
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  let comptroller = Comptroller.load('1')
-  // This is the first event used in this mapping, so we use it to create the entity
-  if (comptroller == null) {
-    comptroller = new Comptroller('1')
-  }
+  let comptroller = getOrCreateComptroller(event.address.toHex())
   comptroller.priceOracle = event.params.newPriceOracle
   comptroller.save()
 }

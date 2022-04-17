@@ -4,13 +4,14 @@ repository: https://github.com/chainscore/comptroller
 schema:
   file: ./schema.graphql
 dataSources:
+{{#comptrollers}}
   - kind: ethereum/contract
-    name: Comptroller
-    network: mainnet
+    name: {{ name }}
+    network: {{ network }}
     source:
-      address: '0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B'
+      address: '{{ address }}'
       abi: Comptroller
-      startBlock: 7700000
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -47,10 +48,11 @@ dataSources:
           handler: handleNewMaxAssets
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
+{{/comptrollers}}
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: mainnet
+    network: {{ network }}
     source:
       abi: CToken
     mapping:
