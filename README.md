@@ -17,3 +17,5 @@ The ABI used is `ctoken.json`. It is a stripped down version of the full abi pro
 Below are a few ways to show how to query the Compound V2 Subgraph for data. The queries show most of the information that is queryable, but there are many other filtering options that can be used, just check out the [querying api](https://github.com/graphprotocol/graph-node/blob/master/docs/graphql-api.md).
 
 You can also see the saved queries on the hosted service for examples.
+
+# comp
